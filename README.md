@@ -79,16 +79,16 @@ README.md
 ## 📋 How To Run
 
 1. **Clone the repo:**  
-   `git clone https://github.com/yourusername/leaderboard-app.git`
-2. **Install dependencies:**  
+   `git clone https://github.com/syam-praneeth/leaderboardTask.git`
+3. **Install dependencies:**  
    - Backend: `npm install`  
    - Frontend: `npm install`
-3. **Start MongoDB locally or use a cloud URI.**
-4. **Run backend:**  
+4. **Start MongoDB locally or use a cloud URI.**
+5. **Run backend:**  
    `node backend/server.js`
-5. **Run frontend:**  
+6. **Run frontend:**  
    `npm start` in `frontend/`
-6. **Open app in your browser!**
+7. **Open app in your browser!**
 
 ---
 
@@ -97,3 +97,4 @@ README.md
 Made by Praneeth  
 3rd-year CSE, VNRVJIET  
 Skills: MERN Stack, DSA (C++), AI/ML Engineer
+
