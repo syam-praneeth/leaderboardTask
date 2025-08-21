@@ -68,14 +68,6 @@ README.md
 
 ---
 
-## 📲 Screenshots
-
-| Weekly Contribution Ranking | Wealth Ranking | Hourly Ranking |
-| --- | --- | --- |
-| ![Weekly Ranking](attached_image:1) | ![Wealth Ranking](attached_image:2) | ![Hourly Ranking](attached_image:3) |
-
----
-
 ## 📋 How To Run
 
 1. **Clone the repo:**  
@@ -97,4 +89,5 @@ README.md
 Made by Praneeth  
 3rd-year CSE, VNRVJIET  
 Skills: MERN Stack, DSA (C++), AI/ML Engineer
+
 
