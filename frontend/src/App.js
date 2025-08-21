@@ -1,45 +1,49 @@
 import React, { useEffect, useState } from "react";
+import "./App.css";
 import api from "./services/api";
 import UserSelectDropdown from "./components/UserSelectDropdown";
 import ClaimButton from "./components/ClaimButton";
 import Leaderboard from "./components/Leaderboard";
 import ClaimHistory from "./components/ClaimHistory";
+import { FaGift, FaCrown, FaTrophy, FaUserCircle } from "react-icons/fa";
 
-function App() {
+export default function App() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [claimedPoints, setClaimedPoints] = useState(null);
-  const [activeTab, setActiveTab] = useState("party");
-  const [activeSubTab, setActiveSubTab] = useState("weekly");
+  const [activeTab, setActiveTab] = useState("weekly");
   const [rewardsOpen, setRewardsOpen] = useState(false);
 
-  const fetchUsers = async () => {
-    try {
-      const res = await api.get("/users");
-      setLeaderboard(res.data.leaderboard);
-      if (!selectedUser && res.data.leaderboard.length) {
-        setSelectedUser(res.data.leaderboard[0]._id);
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await api.get("/users");
+        setLeaderboard(res.data.leaderboard || []);
+        if (res.data.leaderboard && res.data.leaderboard.length > 0)
+          setSelectedUser(res.data.leaderboard[0]._id);
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
     }
-  };
+    load();
+  }, []);
 
   const handleClaim = async () => {
     if (!selectedUser) return;
     try {
       const res = await api.post(`/claim/${selectedUser}`);
       setClaimedPoints(res.data.claimedPoints);
-      setLeaderboard(res.data.leaderboard);
+      setLeaderboard(res.data.leaderboard || []);
     } catch (err) {
       console.error(err);
     }
   };
 
   const handleAddUser = async (name) => {
+    if (!name) return;
     try {
       const res = await api.post("/users", { name });
-      setLeaderboard(res.data.leaderboard);
+      setLeaderboard(res.data.leaderboard || []);
       setSelectedUser(res.data.user._id);
     } catch (err) {
       console.error(err);
@@ -49,147 +53,104 @@ function App() {
   const top3 = leaderboard.slice(0, 3);
 
   return (
-    <div
-      className={`app app-container ${
-        activeSubTab === "wealth"
-          ? "theme-wealth"
-          : activeSubTab === "hourly"
-          ? "theme-hourly"
-          : "theme-weekly"
-      }`}
-    >
-      <div
-        className="rewards-btn"
-        title="Rewards"
-        onClick={() => setRewardsOpen((s) => !s)}
-        role="button"
-        aria-label="Rewards"
-      >
-        🎁
-      </div>
-
-      {rewardsOpen && (
-        <div className="rewards-panel" onClick={(e) => e.stopPropagation()}>
-          <div style={{ fontWeight: 700, marginBottom: 8 }}>Rewards</div>
-          <div style={{ fontSize: 14, color: "#333" }}>
-            No rewards available yet.
-          </div>
-          <button
-            style={{ marginTop: 10 }}
-            onClick={() => setRewardsOpen(false)}
-          >
-            Close
-          </button>
-        </div>
-      )}
-
-      <nav className="tabs-bar" role="navigation">
+    <div className="app">
+      <div className="tabs-bar">
         <div
-          className={activeTab === "party" ? "tab-active" : "tab-inactive"}
-          onClick={() => setActiveTab("party")}
+          className={activeTab === "weekly" ? "tab-active" : ""}
+          onClick={() => setActiveTab("weekly")}
         >
-          Party Ranking
+          Weekly
         </div>
         <div
-          className={activeTab === "live" ? "tab-active" : "tab-inactive"}
-          onClick={() => setActiveTab("live")}
+          className={activeTab === "wealth" ? "tab-active" : ""}
+          onClick={() => setActiveTab("wealth")}
         >
-          Live Ranking
+          Total Wealth
         </div>
         <div
-          className={activeTab === "hourly" ? "tab-active" : "tab-inactive"}
+          className={activeTab === "hourly" ? "tab-active" : ""}
           onClick={() => setActiveTab("hourly")}
         >
-          Hourly Ranking
-        </div>
-        <div style={{ marginLeft: "auto", color: "#666" }}>?</div>
-      </nav>
-
-      <div
-        className="sub-tabs"
-        style={{ display: "flex", gap: 12, marginBottom: 18 }}
-      >
-        <div
-          className={activeSubTab === "weekly" ? "tab-active" : "tab-inactive"}
-          onClick={() => setActiveSubTab("weekly")}
-        >
-          Weekly Contribution Ranking
-        </div>
-        <div
-          className={activeSubTab === "wealth" ? "tab-active" : "tab-inactive"}
-          onClick={() => setActiveSubTab("wealth")}
-        >
-          Wealth Ranking
-        </div>
-        <div
-          className={activeSubTab === "hourly" ? "tab-active" : "tab-inactive"}
-          onClick={() => setActiveSubTab("hourly")}
-        >
-          Hourly Contribution
+          Hourly
         </div>
       </div>
 
-      <header className="header-main">
-        <div className="header-trophy-icon">🏆</div>
-        <div className="header-title">
-          {activeSubTab === "wealth"
-            ? "Wealth Ranking"
-            : activeSubTab === "hourly"
-            ? "Hourly Ranking"
-            : "Weekly Contribution"}
+      <div className="header-main">
+        <div className="header-left">
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <FaTrophy size={28} color="#2563eb" />
+            <div>
+              <div className="header-title">Leaderboard</div>
+              <div className="settlement-time">Next settlement: 02:00 UTC</div>
+            </div>
+          </div>
         </div>
-        <div className="settlement-time">Settlement time: 2 days</div>
-      </header>
 
-      {/* Podium */}
-      <section className="podium-container">
-        {top3.map((u, idx) => {
-          const pos = idx === 0 ? "middle" : "side";
-          return (
+        <div>
+          <button
+            className="rewards-btn"
+            onClick={() => setRewardsOpen(!rewardsOpen)}
+            title="Rewards"
+          >
+            <FaGift />
+          </button>
+          {rewardsOpen && <div className="rewards-panel">Rewards content</div>}
+        </div>
+      </div>
+
+      <div className="podium-container">
+        {top3.map((u, idx) => (
+          <div
+            key={u._id}
+            className={`podium-card ${idx === 1 ? "winner" : ""}`}
+          >
+            <div className="podium-avatar">
+              <FaUserCircle size={64} color="#94a3b8" />
+            </div>
+            <div className="podium-name">{u.name}</div>
+            <div className="podium-points">
+              {u.totalPoints} pts {idx === 0 && <FaCrown color="#f59e0b" />}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid">
+        <div>
+          <div className="leaderboard-card">
             <div
-              className={`podium-card ${idx === 0 ? "middle" : ""}`}
-              key={u._id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
             >
-              {idx === 0 && <div className="podium-trophy">👑</div>}
-              <div className="podium-avatar" />
-              <div style={{ fontWeight: 700, marginTop: 8 }}>{u.name}</div>
-              <div className="podium-points">
-                {u.totalPoints} <span style={{ marginLeft: 6 }}>🏆</span>
+              <h3>Leaderboard</h3>
+              <div className="controls">
+                <UserSelectDropdown
+                  users={leaderboard}
+                  selectedUser={selectedUser}
+                  onSelect={setSelectedUser}
+                  onAddUser={handleAddUser}
+                />
+                <ClaimButton onClaim={handleClaim} />
               </div>
             </div>
-          );
-        })}
-      </section>
 
-      {/* Controls */}
-      <div className="controls">
-        <UserSelectDropdown
-          users={leaderboard}
-          selectedUser={selectedUser}
-          onSelect={setSelectedUser}
-          onAddUser={handleAddUser}
-        />
-        <ClaimButton onClaim={handleClaim} />
-        {claimedPoints !== null && (
-          <div className="claimed">You claimed: {claimedPoints} points</div>
-        )}
-      </div>
-
-      <div className="leaderboard-table">
-        <Leaderboard users={leaderboard} />
-      </div>
-
-      <ClaimHistory selectedUser={selectedUser} />
-
-      <footer className="footer-bar">
-        <div className="footer-user">
-          <div className="footer-status-icon">🔊</div>
-          <div style={{ fontWeight: 700 }}>Devil</div>
+            <Leaderboard users={leaderboard} />
+          </div>
+          <div className="footer-bar">
+            Leaderboard updates after each claim.
+          </div>
         </div>
-        <div className="footer-points">1200</div>
-      </footer>
+
+        <div>
+          <div className="panel">
+            <h4>Claim History</h4>
+            <ClaimHistory userId={selectedUser} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-
-export default App;

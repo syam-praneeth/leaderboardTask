@@ -1,26 +1,19 @@
 import React from "react";
+import { FaUserCircle } from "react-icons/fa";
 
-export default function Leaderboard({ users }) {
+export default function Leaderboard({ users = [] }) {
   return (
-    <div className="leaderboard">
-      <table>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Name</th>
-            <th>Points</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u) => (
-            <tr key={u._id}>
-              <td>{u.rank}</td>
-              <td>{u.name}</td>
-              <td>{u.totalPoints}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="leaderboard-list">
+      {users.map((u) => (
+        <div className="leader-item" key={u._id}>
+          <div className="rank">{u.rank}</div>
+          <div className="user">
+            <FaUserCircle className="avatar-sm" />
+            <div className="name">{u.name}</div>
+          </div>
+          <div className="points">{u.totalPoints}</div>
+        </div>
+      ))}
     </div>
   );
 }
